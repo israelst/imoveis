@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from model_mommy.mommy import make
+
 from cms.models import Place
 
 
@@ -9,6 +11,21 @@ class ListViewTest(TestCase):
         url = reverse('cms:place_list')
         response = self.client.get(url)
         self.assertTemplateUsed('cms/place_list')
+
+
+class PlaceDetailViewTest(TestCase):
+    def setUp(self):
+        self.place = make(Place)
+        url = self.place.get_absolute_url()
+        self.response = self.client.get(url)
+
+    def test_correct_template(self):
+        self.assertTemplateUsed(self.response, 'cms/place_detail.html')
+
+    def test_in_context(self):
+        self.assertIn('object', self.response.context)
+        obj = self.response.context['object']
+        self.assertEqual(self.place, obj)
 
 
 class CreateViewTest(TestCase):

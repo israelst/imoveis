@@ -4,10 +4,13 @@ body{
   padding: 0;
   margin: 0;
   background-color: #f8f8f8;
+  font-size: 2vh;
 }
+
 body > * > *{
-  max-width: 780px;
+  max-width: 880px;
   margin: 0em auto;
+  padding: 1em;
 }
 
 body > header > div{
@@ -23,9 +26,14 @@ body > section{
   margin-bottom: 3em;
   background-color: #fff;
 }
+
 body > header{
   padding: 2em 0;
 }
+
 body > header h1{
   font-size: 4em;
+  font-family: 'Sacramento', cursive;
+  font-weight: lighter;
+  margin: 2em 0 0;
 }

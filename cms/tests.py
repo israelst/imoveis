@@ -28,6 +28,24 @@ class PlaceDetailViewTest(TestCase):
         self.assertEqual(self.place, obj)
 
 
+class PlaceListViewTest(TestCase):
+    def setUp(self):
+        self.url = reverse('cms:place_list')
+
+    def test_correct_template(self):
+        place = make(Place)
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, 'cms/place_list.html')
+
+    def test_context(self):
+        place_1 = make(Place)
+        place_2 = make(Place)
+        response = self.client.get(self.url)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list']
+        self.assertCountEqual([place_1, place_2], objs)
+
+
 class CreateViewTest(TestCase):
     def setUp(self):
         self.url = reverse('cms:place_create')

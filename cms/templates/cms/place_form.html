@@ -1,3 +1,28 @@
 {% extends 'core/base.html' %}
 {% block content %}
+<h2>Add a new place.</h2>
+<p>
+    <a href="{% url 'cms:place_list' %}">Back to place list.</a>
+</p>
+<form method="post" action="">
+{% csrf_token %}
+{% for field in form %}
+  <div class="form-item">
+  {{ field.label_tag }}
+  {{ field }}
+  </div>
+{% endfor %}
+    {% if form.errors %}
+    <div class="errors">
+        <p>
+            {% for field in form %}
+            {% if field.errors %}{{ field.label }} - {{ field.errors|striptags }} {% endif %}
+            {% endfor %}
+        </p>
+    </div>
+    {% endif %}
+  <div class="form-item">
+    <input type="submit" value="Create" class="success" name="">
+  </div>
+</form>
 {% endblock %}

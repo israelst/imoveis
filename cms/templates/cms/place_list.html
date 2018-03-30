@@ -3,7 +3,16 @@
   <p>
   There is no places to show yet.
   </p>
-  <p>
+<ul class='list'>
+  <li>
     <a href="{% url 'cms:place_create' %}">➕ Add a new place.</a>
-  </p>
+  </li>
+{% for obj in object_list %}
+  <li>
+    <a href="{{ obj.get_absolute_url }}">
+      {{ obj.details }}
+    </a>
+  </li>
+{% endfor %}
+</ul>
 {% endblock %}

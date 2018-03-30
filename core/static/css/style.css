@@ -9,6 +9,15 @@ body > * > *{
   max-width: 780px;
   margin: 0em auto;
 }
+
+body > header > div{
+  background-image: url('../img/house.png');
+  background-position: bottom right;
+  background-repeat: no-repeat;
+  background-size: contain;
+  padding-bottom: 0;
+}
+
 body > section{
   padding: 2em 0;
   margin-bottom: 3em;

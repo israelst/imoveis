@@ -1,0 +1,21 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% block content %}
+<p>
+  <a href="{% url 'cms:place_list' %}">Back to place list.</a>
+</p>
+<h2>Place details</h2>
+<p class="details">{{ object.details }}</p>
+<table>
+  <tbody>
+    <tr>
+      <th>Price</th>
+      <td>${{ object.price|intcomma }}</td>
+    </tr>
+    <tr>
+      <th>Size</th>
+      <td>{{ object.size }}m<sup>2</sup></td>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}

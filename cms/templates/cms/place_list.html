@@ -1,4 +1,9 @@
 {% extends 'core/base.html' %}
 {% block content %}
+  <p>
   There is no places to show yet.
+  </p>
+  <p>
+    <a href="{% url 'cms:place_create' %}">➕ Add a new place.</a>
+  </p>
 {% endblock %}

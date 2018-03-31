@@ -1,3 +1,5 @@
+import os
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -49,10 +51,14 @@ class PlaceListViewTest(TestCase):
 class CreateViewTest(TestCase):
     def setUp(self):
         self.url = reverse('cms:place_create')
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        picture_path = os.path.join(BASE_DIR, 'picture-fixture.jpg')
+        self.picture = open(picture_path, 'rb')
         self.price = 10000
         self.size = 80
         self.details = 'This is an amazing place'
-        self.data = dict(details=self.details,
+        self.data = dict(picture=self.picture,
+                         details=self.details,
                          size=self.size,
                          price=self.price)
 
@@ -64,7 +70,7 @@ class CreateViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertIn('form', response.context)
         form = response.context['form']
-        fields = ('details', 'size', 'price')
+        fields = ('picture', 'details', 'size', 'price')
         self.assertCountEqual(fields, form.fields.keys())
 
     def test_redirect_after_created(self):

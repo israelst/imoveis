@@ -5,6 +5,7 @@
   <a href="{% url 'cms:place_list' %}">Back to place list.</a>
 </p>
 <h2>Place details</h2>
+<img src="{{ object.picture.url }}" alt="Picture" width="100%">
 <p class="details">{{ object.details }}</p>
 <table>
   <tbody>

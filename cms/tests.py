@@ -17,7 +17,7 @@ class ListViewTest(TestCase):
 
 class PlaceDetailViewTest(TestCase):
     def setUp(self):
-        self.place = make(Place)
+        self.place = make(Place, _create_files=True)
         url = self.place.get_absolute_url()
         self.response = self.client.get(url)
 
@@ -35,13 +35,13 @@ class PlaceListViewTest(TestCase):
         self.url = reverse('cms:place_list')
 
     def test_correct_template(self):
-        place = make(Place)
+        place = make(Place, _create_files=True)
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'cms/place_list.html')
 
     def test_context(self):
-        place_1 = make(Place)
-        place_2 = make(Place)
+        place_1 = make(Place, _create_files=True)
+        place_2 = make(Place, _create_files=True)
         response = self.client.get(self.url)
         self.assertIn('object_list', response.context)
         objs = response.context['object_list']

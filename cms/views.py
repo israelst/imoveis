@@ -6,7 +6,7 @@ from cms.models import Place
 
 class PlaceCreateView(CreateView):
     model = Place
-    fields = ('details', 'size', 'price')
+    fields = ('picture', 'details', 'size', 'price')
 
 
 class PlaceDetailView(DetailView):

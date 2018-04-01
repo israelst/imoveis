@@ -1,8 +1,6 @@
 {% extends 'core/base.html' %}
+{% load imagekit %}
 {% block content %}
-  <p>
-  There is no places to show yet.
-  </p>
 <ul class='list'>
   <li>
     <a href="{% url 'cms:place_create' %}">➕ Add a new place.</a>
@@ -10,8 +8,9 @@
 {% for obj in object_list %}
   <li>
     <a href="{{ obj.get_absolute_url }}">
-      {{ obj.details }}
+    {% thumbnail "200x200" obj.picture %}
     </a>
+    {{ obj.details }}
   </li>
 {% endfor %}
 </ul>

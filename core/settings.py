@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'cms',
     'imagekit',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +128,14 @@ STATICFILES_STORAGE = config('STATICFILES_STORAGE', default='whitenoise.django.G
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+BOTO_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = config('DEFAULT_FILE_STORAGE', default=BOTO_STORAGE)
+
+if DEFAULT_FILE_STORAGE == BOTO_STORAGE:
+    AWS_ACCESS_KEY_ID = config('BUCKETEER_AWS_ACCESS_KEY_ID')
+    AWS_S3_REGION_NAME = config('BUCKETEER_AWS_REGION')
+    AWS_SECRET_ACCESS_KEY = config('BUCKETEER_AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = config('BUCKETEER_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_S3_FILE_OVERWRITE = False

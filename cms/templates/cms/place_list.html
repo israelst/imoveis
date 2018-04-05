@@ -3,14 +3,16 @@
 {% block content %}
 <ul class='list'>
   <li>
-    <a href="{% url 'cms:place_create' %}">➕ Add a new place.</a>
+    <a href="{% url 'cms:place_create' %}" title="Add a new place.">➕</a>
   </li>
 {% for obj in object_list %}
   <li>
     <a href="{{ obj.get_absolute_url }}">
     {% thumbnail "200x200" obj.picture %}
     </a>
-    {{ obj.details }}
+    <p>
+    {{ obj.details | truncatechars:30 }}
+    </p>
   </li>
 {% endfor %}
 </ul>

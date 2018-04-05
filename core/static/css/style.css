@@ -110,3 +110,72 @@ tr > *{
 th{
   text-align: left;
 }
+
+ul.list{
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+ul.list li{
+  display: block;
+  margin: 1em 0.5em;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+img{
+  border-radius: 3px;
+}
+
+ul.list li a:before{
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+}
+
+ul.list li a:before,
+ul.list li a + p{
+  transition: opacity 0.5s;
+  opacity: 1;
+}
+
+ul.list li a:hover + p,
+ul.list li a:hover:before{
+  opacity: 0;
+}
+
+ul.list li:first-child a{
+  font-size: 3.5em;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+  vertical-align: middle;
+  font-weight: lighter;
+  padding: 1em 0;
+  height: 100%;
+  box-sizing: border-box;
+  background-color: #fbf9f5;
+}
+
+ul.list li:first-child a:before{
+  background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.05));
+}
+
+ul.list li a + p{
+  position: absolute;
+  bottom: 0;
+  color: #fbf9f5;
+  margin: .5em;
+}
+
+li img,
+ul.list li :first-child{
+  width: 200px;
+  height: 200px;
+}

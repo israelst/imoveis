@@ -1,5 +1,6 @@
 import os
 
+from django.contrib.gis.geos import Point
 from django.test import TestCase
 from django.urls import reverse
 
@@ -53,6 +54,37 @@ class PlaceListViewTest(TestCase):
         self.assertIn('object_list', response.context)
         objs = response.context['object_list']
         self.assertCountEqual([], objs)
+
+    def test_order_by_distance_to_madureira(self):
+        Botafogo = Point(-22.9577904, -43.1848308, srid=32140)
+        Flamengo = Point(-22.9352825, -43.1805203, srid=32140)
+        Centro = Point(-22.9058558, -43.1811104, srid=32140)
+        madureira = dict(lat=-22.8716467, lng=-43.3391176)
+
+        place_1 = make(Place, _create_files=True, location=Flamengo, details='Flamengo')
+        place_2 = make(Place, _create_files=True, location=Botafogo, details='Botafogo')
+        place_3 = make(Place, _create_files=True, location=Centro, details='Centro')
+
+        response = self.client.get(self.url, data=madureira)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list'].values_list('details', flat=True)
+        self.assertSequenceEqual(['Centro', 'Flamengo', 'Botafogo'], objs)
+
+    def test_order_by_distance_to_centro(self):
+        Botafogo = Point(-22.9577904, -43.1848308, srid=32140)
+        Flamengo = Point(-22.9352825, -43.1805203, srid=32140)
+        Madureira = Point(-22.8716467, -43.3391176, srid=32140)
+        centro = dict(lat=-22.9058558, lng=-43.1811104)
+
+        place_1 = make(Place, _create_files=True, location=Flamengo, details='Flamengo')
+        place_2 = make(Place, _create_files=True, location=Botafogo, details='Botafogo')
+        place_3 = make(Place, _create_files=True, location=Madureira, details='Madureira')
+
+        response = self.client.get(self.url, data=centro)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list'].values_list('details', flat=True)
+        self.assertSequenceEqual(['Flamengo', 'Botafogo', 'Madureira'], objs)
+
 
 class CreateViewTest(TestCase):
     def setUp(self):

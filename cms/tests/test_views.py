@@ -47,6 +47,12 @@ class PlaceListViewTest(TestCase):
         objs = response.context['object_list']
         self.assertCountEqual([place_1, place_2], objs)
 
+    def test_empty_state(self):
+        self.assertEqual(0, Place.objects.count())
+        response = self.client.get(self.url)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list']
+        self.assertCountEqual([], objs)
 
 class CreateViewTest(TestCase):
     def setUp(self):

@@ -32,12 +32,13 @@ class PlaceFormTest(TestCase):
         )
         self.assertSequenceEqual(fields, list(PlaceForm().fields.keys()))
 
-    @patch('cms.forms.address_to_point')
+    @patch('cms.forms.address_to_point', side_effect = ValueError('Invalid'))
     def test_invalid_address(self, address_to_point):
-        address_to_point.side_effect = ValueError
         self.data['address'] = 'Invalid address'
         form = PlaceForm(data=self.data, files=self.files)
         self.assertFalse(form.is_valid())
+        errors = dict(address=['Invalid'])
+        self.assertEqual(errors, form.errors)
 
     @patch('cms.forms.address_to_point')
     def test_valid_address(self, address_to_point):

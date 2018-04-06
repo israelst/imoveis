@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from model_mommy.mommy import make
+from model_mommy.recipe import Recipe
 
 from cms.models import Place
 
@@ -34,15 +35,16 @@ class PlaceDetailViewTest(TestCase):
 class PlaceListViewTest(TestCase):
     def setUp(self):
         self.url = reverse('cms:place_list')
+        self.place = Recipe(Place, _create_files=True)
 
     def test_correct_template(self):
-        place = make(Place, _create_files=True)
+        place = self.place.make()
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'cms/place_list.html')
 
     def test_context(self):
-        place_1 = make(Place, _create_files=True)
-        place_2 = make(Place, _create_files=True)
+        place_1 = self.place.make()
+        place_2 = self.place.make()
         response = self.client.get(self.url)
         self.assertIn('object_list', response.context)
         objs = response.context['object_list']
@@ -61,9 +63,9 @@ class PlaceListViewTest(TestCase):
         Centro = Point(-22.9058558, -43.1811104, srid=32140)
         madureira = dict(lat=-22.8716467, lng=-43.3391176)
 
-        place_1 = make(Place, _create_files=True, location=Flamengo, details='Flamengo')
-        place_2 = make(Place, _create_files=True, location=Botafogo, details='Botafogo')
-        place_3 = make(Place, _create_files=True, location=Centro, details='Centro')
+        place_1 = self.place.make(location=Flamengo, details='Flamengo')
+        place_2 = self.place.make(location=Botafogo, details='Botafogo')
+        place_3 = self.place.make(location=Centro, details='Centro')
 
         response = self.client.get(self.url, data=madureira)
         self.assertIn('object_list', response.context)
@@ -76,9 +78,9 @@ class PlaceListViewTest(TestCase):
         Madureira = Point(-22.8716467, -43.3391176, srid=32140)
         centro = dict(lat=-22.9058558, lng=-43.1811104)
 
-        place_1 = make(Place, _create_files=True, location=Flamengo, details='Flamengo')
-        place_2 = make(Place, _create_files=True, location=Botafogo, details='Botafogo')
-        place_3 = make(Place, _create_files=True, location=Madureira, details='Madureira')
+        place_1 = self.place.make(location=Flamengo, details='Flamengo')
+        place_2 = self.place.make(location=Botafogo, details='Botafogo')
+        place_3 = self.place.make(location=Madureira, details='Madureira')
 
         response = self.client.get(self.url, data=centro)
         self.assertIn('object_list', response.context)

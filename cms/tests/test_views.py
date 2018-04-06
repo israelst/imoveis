@@ -97,7 +97,9 @@ class CreateViewTest(TestCase):
         self.price = 10000
         self.size = 80
         self.details = 'This is an amazing place'
-        self.data = dict(picture=self.picture,
+        self.address = 'Avenida Rio Branco 1, Centro, Rio de Janeiro'
+        self.data = dict(address=self.address,
+                         picture=self.picture,
                          details=self.details,
                          size=self.size,
                          price=self.price)

@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.gis.geos import Point
 
 from cms.models import Place
 from cms.services import address_to_point
@@ -12,11 +13,10 @@ class PlaceForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         address = cleaned_data.get('address')
-        location = cleaned_data.get('location')
 
         try:
             _location = address_to_point(address)
-            location.coords = _location
+            location = Point(*_location)
             self.cleaned_data['location'] = location
         except Exception as e:
-            self.add_error('address', e)
+            self.add_error('address', str(e))

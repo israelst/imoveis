@@ -48,3 +48,23 @@ class PlaceFormTest(TestCase):
         self.assertTrue(form.is_valid())
         place = form.save()
         self.assertEqual(latlng, place.location.coords)
+
+    @patch('cms.forms.address_to_point')
+    def test_location_is_not_required(self, address_to_point):
+        latlng = (-42, -24)
+        address_to_point.return_value = latlng
+        form = PlaceForm(data=self.data, files=self.files)
+        self.assertTrue(form.is_valid())
+        place = form.save()
+        self.assertEqual(latlng, place.location.coords)
+
+    @patch('cms.forms.address_to_point')
+    def test_ignore_informed_location(self, address_to_point):
+        informed_latlng = 'POINT(-13 -17)'
+        latlng = (-42, -24)
+        address_to_point.return_value = latlng
+        self.data['location'] = informed_latlng
+        form = PlaceForm(data=self.data, files=self.files)
+        self.assertTrue(form.is_valid())
+        place = form.save()
+        self.assertEqual(latlng, place.location.coords)

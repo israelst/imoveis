@@ -1,4 +1,5 @@
 import os
+from unittest.mock import patch
 
 from django.contrib.gis.geos import Point
 from django.test import TestCase
@@ -104,18 +105,21 @@ class CreateViewTest(TestCase):
                          size=self.size,
                          price=self.price)
 
-    def test_correct_template(self):
+    @patch('cms.forms.address_to_point', return_value=(42, 42))
+    def test_correct_template(self, address_to_point):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'cms/place_form.html')
 
-    def test_form_in_context(self):
+    @patch('cms.forms.address_to_point', return_value=(42, 42))
+    def test_form_in_context(self, address_to_point):
         response = self.client.get(self.url)
         self.assertIn('form', response.context)
         form = response.context['form']
-        fields = ('picture', 'details', 'size', 'price')
+        fields = ('picture', 'address', 'details', 'size', 'price', 'location')
         self.assertCountEqual(fields, form.fields.keys())
 
-    def test_redirect_after_created(self):
+    @patch('cms.forms.address_to_point', return_value=(42, 42))
+    def test_redirect_after_created(self, address_to_point):
         self.assertEqual(0, Place.objects.count())
         response = self.client.post(self.url, self.data)
         self.assertEqual(1, Place.objects.count())
@@ -123,11 +127,16 @@ class CreateViewTest(TestCase):
         url = reverse('cms:place_detail', args=[place_id])
         self.assertRedirects(response, url)
 
-    def test_save(self):
+    @patch('cms.forms.address_to_point')
+    def test_save(self, address_to_point):
+        latlng = (-42, -24)
+        address_to_point.return_value = latlng
         self.assertEqual(0, Place.objects.count())
         self.client.post(self.url, self.data)
         self.assertEqual(1, Place.objects.count())
         place = Place.objects.first()
         self.assertEqual(self.details, place.details)
+        self.assertEqual(self.address, place.address)
         self.assertEqual(self.size, place.size)
         self.assertEqual(self.price, place.price)
+        self.assertEqual(latlng, place.location.coords)

@@ -3,12 +3,13 @@ from django.contrib.gis.db.models.functions import Distance
 from django.shortcuts import render
 from django.views.generic import CreateView, DetailView, ListView
 
+from cms.forms import PlaceForm
 from cms.models import Place
 
 
 class PlaceCreateView(CreateView):
     model = Place
-    fields = ('picture', 'details', 'size', 'price')
+    form_class = PlaceForm
 
 
 class PlaceDetailView(DetailView):

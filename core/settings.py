@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.gis',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -80,6 +81,10 @@ DATABASES = {
         cast=db_url
     )
 }
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+
+GDAL_LIBRARY_PATH = config('GDAL_LIBRARY_PATH', default='/usr/lib/libgdal.so')
+GEOS_LIBRARY_PATH = config('GEOS_LIBRARY_PATH', default='/usr/lib/libgeos_c.so')
 
 
 

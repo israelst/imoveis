@@ -1,9 +1,12 @@
 import os
+from unittest.mock import patch
 
+from django.contrib.gis.geos import Point
 from django.test import TestCase
 from django.urls import reverse
 
 from model_mommy.mommy import make
+from model_mommy.recipe import Recipe
 
 from cms.models import Place
 
@@ -33,19 +36,57 @@ class PlaceDetailViewTest(TestCase):
 class PlaceListViewTest(TestCase):
     def setUp(self):
         self.url = reverse('cms:place_list')
+        self.place = Recipe(Place, _create_files=True)
 
     def test_correct_template(self):
-        place = make(Place, _create_files=True)
+        place = self.place.make()
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'cms/place_list.html')
 
     def test_context(self):
-        place_1 = make(Place, _create_files=True)
-        place_2 = make(Place, _create_files=True)
+        place_1 = self.place.make()
+        place_2 = self.place.make()
         response = self.client.get(self.url)
         self.assertIn('object_list', response.context)
         objs = response.context['object_list']
         self.assertCountEqual([place_1, place_2], objs)
+
+    def test_empty_state(self):
+        self.assertEqual(0, Place.objects.count())
+        response = self.client.get(self.url)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list']
+        self.assertCountEqual([], objs)
+
+    def test_order_by_distance_to_madureira(self):
+        Botafogo = Point(-22.9577904, -43.1848308, srid=32140)
+        Flamengo = Point(-22.9352825, -43.1805203, srid=32140)
+        Centro = Point(-22.9058558, -43.1811104, srid=32140)
+        madureira = dict(lat=-22.8716467, lng=-43.3391176)
+
+        place_1 = self.place.make(location=Flamengo, details='Flamengo')
+        place_2 = self.place.make(location=Botafogo, details='Botafogo')
+        place_3 = self.place.make(location=Centro, details='Centro')
+
+        response = self.client.get(self.url, data=madureira)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list'].values_list('details', flat=True)
+        self.assertSequenceEqual(['Centro', 'Flamengo', 'Botafogo'], objs)
+
+    def test_order_by_distance_to_centro(self):
+        Botafogo = Point(-22.9577904, -43.1848308, srid=32140)
+        Flamengo = Point(-22.9352825, -43.1805203, srid=32140)
+        Madureira = Point(-22.8716467, -43.3391176, srid=32140)
+        centro = dict(lat=-22.9058558, lng=-43.1811104)
+
+        place_1 = self.place.make(location=Flamengo, details='Flamengo')
+        place_2 = self.place.make(location=Botafogo, details='Botafogo')
+        place_3 = self.place.make(location=Madureira, details='Madureira')
+
+        response = self.client.get(self.url, data=centro)
+        self.assertIn('object_list', response.context)
+        objs = response.context['object_list'].values_list('details', flat=True)
+        self.assertSequenceEqual(['Flamengo', 'Botafogo', 'Madureira'], objs)
 
 
 class CreateViewTest(TestCase):
@@ -57,23 +98,28 @@ class CreateViewTest(TestCase):
         self.price = 10000
         self.size = 80
         self.details = 'This is an amazing place'
-        self.data = dict(picture=self.picture,
+        self.address = 'Avenida Rio Branco 1, Centro, Rio de Janeiro'
+        self.data = dict(address=self.address,
+                         picture=self.picture,
                          details=self.details,
                          size=self.size,
                          price=self.price)
 
-    def test_correct_template(self):
+    @patch('cms.forms.address_to_point', return_value=(42, 42))
+    def test_correct_template(self, address_to_point):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'cms/place_form.html')
 
-    def test_form_in_context(self):
+    @patch('cms.forms.address_to_point', return_value=(42, 42))
+    def test_form_in_context(self, address_to_point):
         response = self.client.get(self.url)
         self.assertIn('form', response.context)
         form = response.context['form']
-        fields = ('picture', 'details', 'size', 'price')
+        fields = ('picture', 'address', 'details', 'size', 'price', 'location')
         self.assertCountEqual(fields, form.fields.keys())
 
-    def test_redirect_after_created(self):
+    @patch('cms.forms.address_to_point', return_value=(42, 42))
+    def test_redirect_after_created(self, address_to_point):
         self.assertEqual(0, Place.objects.count())
         response = self.client.post(self.url, self.data)
         self.assertEqual(1, Place.objects.count())
@@ -81,11 +127,16 @@ class CreateViewTest(TestCase):
         url = reverse('cms:place_detail', args=[place_id])
         self.assertRedirects(response, url)
 
-    def test_save(self):
+    @patch('cms.forms.address_to_point')
+    def test_save(self, address_to_point):
+        latlng = (-42, -24)
+        address_to_point.return_value = latlng
         self.assertEqual(0, Place.objects.count())
         self.client.post(self.url, self.data)
         self.assertEqual(1, Place.objects.count())
         place = Place.objects.first()
         self.assertEqual(self.details, place.details)
+        self.assertEqual(self.address, place.address)
         self.assertEqual(self.size, place.size)
         self.assertEqual(self.price, place.price)
+        self.assertEqual(latlng, place.location.coords)

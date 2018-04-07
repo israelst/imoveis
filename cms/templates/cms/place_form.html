@@ -7,10 +7,12 @@
 <form method="post" enctype="multipart/form-data">
 {% csrf_token %}
 {% for field in form %}
+{% if field.name != 'location' %}
   <div class="form-item">
   {{ field.label_tag }}
   {{ field }}
   </div>
+{% endif %}
 {% endfor %}
     {% if form.errors %}
     <div class="errors">
